@@ -4,10 +4,13 @@ DEV_COMPOSE  = docker-compose.yml
 
 # --- TARGETS ---
 
-.PHONY: help deploy stop logs dev build clean db-shell
+.PHONY: help deploy stop logs dev build build-base clean db-shell
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+build-base: ## [PROD] Build the heavy base image (vcpkg + dependencies)
+	docker build -f builder.Dockerfile -t expense-bot-builder:latest .
 
 deploy: ## [PROD] Deploy the production stack in the background
 	docker-compose -f $(PROD_COMPOSE) up -d --build
