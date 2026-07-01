@@ -1,4 +1,6 @@
 #include "db_processor.hpp"
+#include <algorithm>
+#include <iterator>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -169,9 +171,9 @@ std::vector<DatabaseProcessor::PendingTask> DatabaseProcessor::get_ready_for_ret
                                  "ORDER BY next_retry_at ASC LIMIT $1",
                                  pqxx::params{RETRY_BATCH_LIMIT});
 
-        for (auto const& row : r) {
-            tasks.push_back({row[0].as<int64_t>(), row[1].as<int64_t>(), row[2].as<std::string>()});
-        }
+        std::transform(r.begin(), r.end(), std::back_inserter(tasks), [](const auto& row) -> PendingTask {
+            return {row[0].template as<int64_t>(), row[1].template as<int64_t>(), row[2].template as<std::string>()};
+        });
     } catch (const std::exception& e) {
         std::cerr << "DB Error (get_ready): " << e.what() << "\n";
     }
