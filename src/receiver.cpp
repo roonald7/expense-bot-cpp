@@ -1,8 +1,9 @@
-#include <iostream>
 #include "processor.hpp"
 #include "receiver.hpp"
 #include "replier.hpp"
 #include "worker_pool.hpp"
+
+#include <iostream>
 
 namespace ragc {
 

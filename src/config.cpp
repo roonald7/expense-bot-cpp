@@ -1,6 +1,7 @@
+#include "config.hpp"
+
 #include <cstdlib>
 #include <stdexcept>
-#include "config.hpp"
 
 namespace ragc {
 
