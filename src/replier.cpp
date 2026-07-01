@@ -1,4 +1,6 @@
 #include "replier.hpp"
+
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 
@@ -29,10 +31,9 @@ dpp::embed Replier::create_expense_embed(const Expense& expense)
 
 std::string Replier::get_category_emoji(const std::string& category)
 {
-    // Convert to lowercase for robust matching
     std::string cat = category;
-    for (auto& c : cat)
-        c = static_cast<char>(tolower(c));
+    std::transform(
+        cat.begin(), cat.end(), cat.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
     if (cat.find("food") != std::string::npos || cat.find("eat") != std::string::npos)
         return "🍔";

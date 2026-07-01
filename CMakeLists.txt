@@ -24,6 +24,7 @@ include_directories(include/models)
 # Define source files
 set(SOURCES
     src/main.cpp
+    src/config.cpp
     src/connection_pool.cpp
     src/worker_pool.cpp
     src/db_processor.cpp

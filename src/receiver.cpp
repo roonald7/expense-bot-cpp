@@ -1,8 +1,9 @@
 #include "receiver.hpp"
-#include <iostream>
 #include "processor.hpp"
 #include "replier.hpp"
 #include "worker_pool.hpp"
+
+#include <iostream>
 
 namespace ragc {
 
@@ -36,9 +37,10 @@ void Receiver::handle_ping(const dpp::slashcommand_t& event)
 void Receiver::handle_expense(const dpp::slashcommand_t& event)
 {
     std::string input = std::get<std::string>(event.get_parameter("query"));
-    int64_t user_id = event.command.usr.id;
+    auto raw_user_id = event.command.usr.id;
+    auto user_id = static_cast<int64_t>(raw_user_id);
 
-    std::cout << "[RECEIVER] Received expense command from " << user_id << std::endl;
+    std::cout << "[RECEIVER] Received expense command from " << user_id << "\n";
 
     event.thinking(false, [this, event, input, user_id](const dpp::confirmation_callback_t& auth) {
         workers_.enqueue([this, event, input, user_id]() {
@@ -67,11 +69,11 @@ void Receiver::register_commands()
             dpp::snowflake gid(std::stoull(*guild_id_));
             bot_.guild_command_create(ping_cmd, gid);
             bot_.guild_command_create(exp_cmd, gid);
-            std::cout << "Receiver: Commands registered to guild " << gid << std::endl;
+            std::cout << "Receiver: Commands registered to guild " << gid << "\n";
         } else {
             bot_.global_command_create(ping_cmd);
             bot_.global_command_create(exp_cmd);
-            std::cout << "Receiver: Commands registered globally." << std::endl;
+            std::cout << "Receiver: Commands registered globally.\n";
         }
     }
 }

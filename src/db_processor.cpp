@@ -1,5 +1,8 @@
 #include "db_processor.hpp"
+
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
@@ -63,19 +66,19 @@ void DatabaseProcessor::init_tables()
         // 4. Apply pending migrations
         for (const auto& [version, sql] : migrations) {
             if (version > current_version) {
-                std::cout << "[DB] Applying migration v" << version << "..." << std::endl;
+                std::cout << "[DB] Applying migration v" << version << "...\n";
                 tx.exec(sql);
                 tx.exec("INSERT INTO schema_migrations (version) VALUES ($1)", pqxx::params{version});
             }
         }
 
         tx.commit();
-        std::cout << "[DB] Schema up to date." << std::endl;
+        std::cout << "[DB] Schema up to date.\n";
     } catch (const pqxx::sql_error& e) {
-        std::cerr << "[DB] Migration Error: " << e.what() << std::endl;
-        std::cerr << "[DB] Failed Query: " << e.query() << std::endl;
+        std::cerr << "[DB] Migration Error: " << e.what() << "\n";
+        std::cerr << "[DB] Failed Query: " << e.query() << "\n";
     } catch (const std::exception& e) {
-        std::cerr << "[DB] Error during schema initialization: " << e.what() << std::endl;
+        std::cerr << "[DB] Error during schema initialization: " << e.what() << "\n";
     }
 }
 
@@ -94,11 +97,11 @@ bool DatabaseProcessor::save_expense(const Expense& expense)
         tx.commit();
         return true;
     } catch (const pqxx::sql_error& e) {
-        std::cerr << "[DB] SQL Error: " << e.what() << std::endl;
-        std::cerr << "[DB] Failed Query: " << e.query() << std::endl;
+        std::cerr << "[DB] SQL Error: " << e.what() << "\n";
+        std::cerr << "[DB] Failed Query: " << e.query() << "\n";
         return false;
     } catch (const std::exception& e) {
-        std::cerr << "[DB] Standard Error: " << e.what() << std::endl;
+        std::cerr << "[DB] Standard Error: " << e.what() << "\n";
         return false;
     }
 }
@@ -116,7 +119,7 @@ int64_t DatabaseProcessor::save_pending_request(int64_t user_id, const std::stri
         tx.commit();
         return r[0][0].as<int64_t>();
     } catch (const std::exception& e) {
-        std::cerr << "DB Error (save_pending): " << e.what() << std::endl;
+        std::cerr << "DB Error (save_pending): " << e.what() << "\n";
         return -1;
     }
 }
@@ -133,7 +136,7 @@ void DatabaseProcessor::update_pending_status(int64_t request_id, const std::str
 
         tx.commit();
     } catch (const std::exception& e) {
-        std::cerr << "DB Error (update_status): " << e.what() << std::endl;
+        std::cerr << "DB Error (update_status): " << e.what() << "\n";
     }
 }
 
@@ -153,7 +156,7 @@ void DatabaseProcessor::schedule_retry(int64_t request_id, int minutes_delay, co
 
         tx.commit();
     } catch (const std::exception& e) {
-        std::cerr << "DB Error (schedule_retry): " << e.what() << std::endl;
+        std::cerr << "DB Error (schedule_retry): " << e.what() << "\n";
     }
 }
 
@@ -166,13 +169,14 @@ std::vector<DatabaseProcessor::PendingTask> DatabaseProcessor::get_ready_for_ret
 
         pqxx::result r = tx.exec("SELECT id, user_id, raw_input FROM pending_requests "
                                  "WHERE status != 'COMPLETED' AND next_retry_at <= CURRENT_TIMESTAMP "
-                                 "ORDER BY next_retry_at ASC LIMIT 10");
+                                 "ORDER BY next_retry_at ASC LIMIT $1",
+                                 pqxx::params{RETRY_BATCH_LIMIT});
 
-        for (auto const& row : r) {
-            tasks.push_back({row[0].as<int64_t>(), row[1].as<int64_t>(), row[2].as<std::string>()});
-        }
+        std::transform(r.begin(), r.end(), std::back_inserter(tasks), [](const auto& row) -> PendingTask {
+            return {row[0].template as<int64_t>(), row[1].template as<int64_t>(), row[2].template as<std::string>()};
+        });
     } catch (const std::exception& e) {
-        std::cerr << "DB Error (get_ready): " << e.what() << std::endl;
+        std::cerr << "DB Error (get_ready): " << e.what() << "\n";
     }
     return tasks;
 }

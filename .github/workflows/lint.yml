@@ -23,3 +23,21 @@ jobs:
         run: |
           # Find all header/source files and verify formatting matches .clang-format
           find src include -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) -print0 | xargs -0 clang-format --dry-run --Werror
+
+  cppcheck-check:
+    name: Cppcheck Safety Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+
+      - name: Run Cppcheck Analysis
+        run: |
+          # Run cppcheck validating security/logical issues and return an error if defects are found
+          cppcheck --enable=warning,style,performance,portability --error-exitcode=1 -I include/ src/
+

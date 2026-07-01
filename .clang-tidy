@@ -1,6 +1,7 @@
 Checks: >
   -*,
   bugprone-*,
+  -bugprone-implicit-widening-of-multiplication-result,
   cert-*,
   clang-analyzer-*,
   cppcoreguidelines-*,
@@ -11,6 +12,16 @@ Checks: >
 
 # Turn off specific checks that are too noisy or not applicable
 HeaderFilterRegex: '^(src|include)/.*'
-AnalyzeTemporaryDtors: false
 FormatStyle: file
 WarningsAsErrors: ''
+
+# Customize check configurations
+CheckOptions:
+  - key:             readability-identifier-length.MinimumParameterNameLength
+    value:           1
+  - key:             readability-identifier-length.MinimumVariableNameLength
+    value:           1
+  - key:             readability-identifier-length.MinimumParameterNameLengthIgnoredRegexp
+    value:           .*
+  - key:             readability-identifier-length.MinimumVariableNameLengthIgnoredRegexp
+    value:           .*

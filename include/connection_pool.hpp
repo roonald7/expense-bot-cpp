@@ -62,6 +62,7 @@ private:
     friend class ConnectionGuard;
     void release(std::unique_ptr<pqxx::connection> conn);
 
+    std::string db_url_;
     std::mutex mutex_;
     std::condition_variable cv_;
     std::queue<std::unique_ptr<pqxx::connection>> pool_;

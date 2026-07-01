@@ -1,4 +1,5 @@
 #include "gemini_client.hpp"
+
 #include <dpp/dpp.h>
 #include <future>
 #include <iostream>
