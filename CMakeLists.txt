@@ -4,6 +4,15 @@ project(expense-bot LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Configure clang-tidy integration if available
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+if(CLANG_TIDY_EXE)
+    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-extra-arg=-Wno-unknown-warning-option")
+else()
+    message(WARNING "clang-tidy not found.")
+endif()
+
 # Find dependencies via vcpkg toolchain
 find_package(dpp REQUIRED)
 find_package(libpqxx REQUIRED)
