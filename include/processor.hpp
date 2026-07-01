@@ -1,8 +1,8 @@
 #pragma once
 
 #include <optional>
+#include "ai_client.hpp"
 #include "db_processor.hpp"
-#include "gemini_client.hpp"
 #include "models/expense.hpp"
 
 namespace ragc {
@@ -19,7 +19,7 @@ public:
      * @param db Reference to the database processor (Dependency Injection).
      * @param ai Reference to the Gemini AI client (Dependency Injection).
      */
-    Processor(DatabaseProcessor& db, GeminiClient& ai);
+    Processor(DatabaseProcessor& db, AIClient& ai);
 
     /**
      * @brief orchestrates the end-to-end task: AI extraction -> DB persistence.
@@ -38,7 +38,7 @@ public:
 
 private:
     DatabaseProcessor& db_;
-    GeminiClient& ai_;
+    AIClient& ai_;
 };
 
 } // namespace ragc

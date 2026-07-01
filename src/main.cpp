@@ -1,6 +1,6 @@
 #include "config.hpp"
 #include "db_processor.hpp"
-#include "gemini_client.hpp"
+#include "ollama_client.hpp"
 #include "processor.hpp"
 #include "receiver.hpp"
 #include "worker_pool.hpp"
@@ -21,11 +21,15 @@ auto main() -> int
         db.init_tables();
 
         dpp::cluster bot(config.token);
-        ragc::GeminiClient ai(bot, config.gemini_key);
+
+        // AI backend — swap OllamaClient for GeminiClient (or any AIClient
+        // subclass) here without touching any other file.
+        ragc::OllamaClient ai(bot, config.ai_api_url, config.ai_api_key, config.ai_model_name);
+
         ragc::Processor processor(db, ai);
         ragc::WorkerPool workers(POOL_SIZE);
 
-        // AI Reliability: Background thread to retry failed Gemini 503 requests
+        // Background thread to retry failed AI requests (429 / 503 / timeout)
         std::thread retry_thread([&processor]() {
             std::cout << "[WORKER] Background retry thread started.\n";
             while (true) {

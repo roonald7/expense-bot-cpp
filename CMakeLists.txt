@@ -29,6 +29,7 @@ set(SOURCES
     src/worker_pool.cpp
     src/db_processor.cpp
     src/gemini_client.cpp
+    src/ollama_client.cpp
     src/processor.cpp
     src/replier.cpp
     src/receiver.cpp

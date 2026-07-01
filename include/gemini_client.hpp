@@ -1,6 +1,7 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include "ai_client.hpp"
+
 #include <string>
 #include <string_view>
 
@@ -11,9 +12,12 @@ class cluster;
 namespace ragc {
 
 /**
- * @brief Client for interacting with the Google Gemini LLM API.
+ * @brief AIClient implementation for the Google Gemini REST API.
+ *
+ * Derives from AIClient so it can be swapped with OllamaClient
+ * (or any future backend) without touching Processor or main.cpp.
  */
-class GeminiClient
+class GeminiClient : public AIClient
 {
 public:
     /**
@@ -27,7 +31,7 @@ public:
     /**
      * @brief Sends user input to Gemini and requests a structured JSON response.
      */
-    nlohmann::json parse_expense(std::string_view user_input);
+    nlohmann::json parse_expense(std::string_view user_input) override;
 
 private:
     dpp::cluster& bot_;

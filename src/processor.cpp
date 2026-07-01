@@ -1,9 +1,10 @@
 #include "processor.hpp"
+#include "ai_client.hpp"
 #include <iostream>
 
 namespace ragc {
 
-Processor::Processor(DatabaseProcessor& db, GeminiClient& ai) : db_(db), ai_(ai)
+Processor::Processor(DatabaseProcessor& db, AIClient& ai) : db_(db), ai_(ai)
 {
 }
 
@@ -13,12 +14,12 @@ std::optional<Expense> Processor::process_message(std::string_view raw_content, 
     int64_t request_id = db_.save_pending_request(user_id, std::string(raw_content));
 
     try {
-        // 2. Send to Gemini for semantic parsing
+        // 2. Send to AI backend for semantic parsing
         nlohmann::json extracted = ai_.parse_expense(raw_content);
 
         if (extracted.is_array()) {
             if (extracted.empty()) {
-                throw std::runtime_error("Empty Gemini response");
+                throw std::runtime_error("Empty AI response");
             }
             extracted = extracted[0];
         }
@@ -43,8 +44,6 @@ std::optional<Expense> Processor::process_message(std::string_view raw_content, 
         std::string err = e.what();
         std::cerr << "Processor error: " << err << "\n";
 
-        // If Gemini is busy or down (429, 503, Timeout), schedule a persistent
-        // retry
         if (err.find("429") != std::string::npos || err.find("503") != std::string::npos ||
             err.find("timeout") != std::string::npos) {
             constexpr int INITIAL_RETRY_DELAY_MINS = 1;
