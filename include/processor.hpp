@@ -1,12 +1,11 @@
 #pragma once
 
+#include <optional>
 #include "db_processor.hpp"
 #include "gemini_client.hpp"
 #include "models/expense.hpp"
-#include <optional>
 
-namespace ragc
-{
+namespace ragc {
 
 /**
  * @brief Coordinates between the LLM parser and the Database persistence.
@@ -20,7 +19,7 @@ public:
      * @param db Reference to the database processor (Dependency Injection).
      * @param ai Reference to the Gemini AI client (Dependency Injection).
      */
-    Processor(DatabaseProcessor &db, GeminiClient &ai);
+    Processor(DatabaseProcessor& db, GeminiClient& ai);
 
     /**
      * @brief orchestrates the end-to-end task: AI extraction -> DB persistence.
@@ -38,8 +37,8 @@ public:
     void retry_background_tasks();
 
 private:
-    DatabaseProcessor &db_;
-    GeminiClient &ai_;
+    DatabaseProcessor& db_;
+    GeminiClient& ai_;
 };
 
 } // namespace ragc

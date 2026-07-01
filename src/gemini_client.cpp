@@ -5,12 +5,9 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-namespace ragc
-{
+namespace ragc {
 
-GeminiClient::GeminiClient(dpp::cluster &bot, std::string_view api_key)
-    : bot_(bot)
-    , api_key_(api_key)
+GeminiClient::GeminiClient(dpp::cluster& bot, std::string_view api_key) : bot_(bot), api_key_(api_key)
 {
 }
 
@@ -40,13 +37,15 @@ nlohmann::json GeminiClient::parse_expense(std::string_view raw_text)
     std::future<dpp::http_request_completion_t> future = promise->get_future();
 
     bot_.request(
-        url, dpp::m_post, [promise](const dpp::http_request_completion_t &completion) { promise->set_value(completion); }, payload.dump(),
+        url,
+        dpp::m_post,
+        [promise](const dpp::http_request_completion_t& completion) { promise->set_value(completion); },
+        payload.dump(),
         "application/json");
 
     auto response = future.get();
 
-    if (response.status != 200)
-    {
+    if (response.status != 200) {
         throw std::runtime_error("Gemini API Error (HTTP " + std::to_string(response.status) + "): " + response.body);
     }
 

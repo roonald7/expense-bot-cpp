@@ -7,8 +7,7 @@
 #include <queue>
 #include <string_view>
 
-namespace ragc
-{
+namespace ragc {
 
 /**
  * @brief Thread-safe PostgreSQL connection pool.
@@ -35,21 +34,21 @@ public:
     class ConnectionGuard
     {
     public:
-        ConnectionGuard(ConnectionPool &pool, std::unique_ptr<pqxx::connection> conn);
+        ConnectionGuard(ConnectionPool& pool, std::unique_ptr<pqxx::connection> conn);
         ~ConnectionGuard();
 
         // Non-copyable, movable
-        ConnectionGuard(const ConnectionGuard &) = delete;
-        ConnectionGuard &operator=(const ConnectionGuard &) = delete;
-        ConnectionGuard(ConnectionGuard &&) = default;
+        ConnectionGuard(const ConnectionGuard&) = delete;
+        ConnectionGuard& operator=(const ConnectionGuard&) = delete;
+        ConnectionGuard(ConnectionGuard&&) = default;
 
-        pqxx::connection &get()
+        pqxx::connection& get()
         {
             return *conn_;
         }
 
     private:
-        ConnectionPool &pool_;
+        ConnectionPool& pool_;
         std::unique_ptr<pqxx::connection> conn_;
     };
 

@@ -7,8 +7,7 @@
 #include <thread>
 #include <vector>
 
-namespace ragc
-{
+namespace ragc {
 
 /**
  * @brief Fixed-size thread pool backed by a blocking task queue.
@@ -35,8 +34,8 @@ public:
     ~WorkerPool();
 
     // Non-copyable, non-movable — owns OS threads
-    WorkerPool(const WorkerPool &) = delete;
-    WorkerPool &operator=(const WorkerPool &) = delete;
+    WorkerPool(const WorkerPool&) = delete;
+    WorkerPool& operator=(const WorkerPool&) = delete;
 
     /**
      * @brief Enqueues a callable to be executed by the next available worker.

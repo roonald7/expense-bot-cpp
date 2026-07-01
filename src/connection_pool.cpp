@@ -1,21 +1,18 @@
 #include "connection_pool.hpp"
 #include <stdexcept>
 
-namespace ragc
-{
+namespace ragc {
 
 // ─── Pool construction ────────────────────────────────────────────────────────
 
 ConnectionPool::ConnectionPool(std::string_view db_url, std::size_t pool_size)
 {
-    if (pool_size == 0)
-    {
+    if (pool_size == 0) {
         throw std::invalid_argument("Connection pool size must be > 0");
     }
 
     const std::string url(db_url);
-    for (std::size_t i = 0; i < pool_size; ++i)
-    {
+    for (std::size_t i = 0; i < pool_size; ++i) {
         pool_.push(std::make_unique<pqxx::connection>(url));
     }
 }
@@ -48,16 +45,14 @@ void ConnectionPool::release(std::unique_ptr<pqxx::connection> conn)
 
 // ─── ConnectionGuard ─────────────────────────────────────────────────────────
 
-ConnectionPool::ConnectionGuard::ConnectionGuard(ConnectionPool &pool, std::unique_ptr<pqxx::connection> conn)
-    : pool_(pool)
-    , conn_(std::move(conn))
+ConnectionPool::ConnectionGuard::ConnectionGuard(ConnectionPool& pool, std::unique_ptr<pqxx::connection> conn)
+    : pool_(pool), conn_(std::move(conn))
 {
 }
 
 ConnectionPool::ConnectionGuard::~ConnectionGuard()
 {
-    if (conn_)
-    {
+    if (conn_) {
         pool_.release(std::move(conn_));
     }
 }

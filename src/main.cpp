@@ -1,10 +1,10 @@
+#include <cstdlib>
+#include <iostream>
 #include "db_processor.hpp"
 #include "gemini_client.hpp"
 #include "processor.hpp"
 #include "receiver.hpp"
 #include "worker_pool.hpp"
-#include <cstdlib>
-#include <iostream>
 
 struct Config
 {
@@ -15,13 +15,12 @@ struct Config
 
     static Config load()
     {
-        const char *token = std::getenv("DISCORD_BOT_TOKEN");
-        const char *db_url = std::getenv("DATABASE_URL");
-        const char *gemini_key = std::getenv("GEMINI_API_KEY");
-        const char *guild_id = std::getenv("DISCORD_GUILD_ID");
+        const char* token = std::getenv("DISCORD_BOT_TOKEN");
+        const char* db_url = std::getenv("DATABASE_URL");
+        const char* gemini_key = std::getenv("GEMINI_API_KEY");
+        const char* guild_id = std::getenv("DISCORD_GUILD_ID");
 
-        if (!token || !db_url || !gemini_key)
-        {
+        if (!token || !db_url || !gemini_key) {
             throw std::runtime_error("Missing critical environment variables (TOKEN, DB_URL, or GEMINI_KEY)");
         }
 
@@ -34,8 +33,7 @@ struct Config
 
 int main()
 {
-    try
-    {
+    try {
         const auto config = Config::load();
         constexpr std::size_t POOL_SIZE = 4;
 
@@ -51,15 +49,11 @@ int main()
         // AI Reliability: Background thread to retry failed Gemini 503 requests
         std::thread retry_thread([&processor]() {
             std::cout << "[WORKER] Background retry thread started." << std::endl;
-            while (true)
-            {
+            while (true) {
                 std::this_thread::sleep_for(std::chrono::minutes(1));
-                try
-                {
+                try {
                     processor.retry_background_tasks();
-                }
-                catch (...)
-                {
+                } catch (...) {
                 }
             }
         });
@@ -72,9 +66,7 @@ int main()
         // 3. Start
         std::cout << "ExpenseBot Booting..." << std::endl;
         bot.start(dpp::st_wait);
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception& e) {
         std::cerr << "FATAL ERROR: " << e.what() << std::endl;
         return 1;
     }

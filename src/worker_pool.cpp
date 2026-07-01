@@ -1,12 +1,10 @@
 #include "worker_pool.hpp"
 
-namespace ragc
-{
+namespace ragc {
 
 WorkerPool::WorkerPool(std::size_t num_threads)
 {
-    for (std::size_t i = 0; i < num_threads; ++i)
-    {
+    for (std::size_t i = 0; i < num_threads; ++i) {
         threads_.emplace_back([this] { worker_loop(); });
     }
 }
@@ -18,10 +16,8 @@ WorkerPool::~WorkerPool()
         stop_ = true;
     }
     cv_.notify_all();
-    for (auto &thread : threads_)
-    {
-        if (thread.joinable())
-        {
+    for (auto& thread : threads_) {
+        if (thread.joinable()) {
             thread.join();
         }
     }
@@ -44,15 +40,13 @@ std::size_t WorkerPool::pending() const
 
 void WorkerPool::worker_loop()
 {
-    while (true)
-    {
+    while (true) {
         std::function<void()> task;
         {
             std::unique_lock<std::mutex> lock(mutex_);
             cv_.wait(lock, [this] { return stop_ || !tasks_.empty(); });
 
-            if (stop_ && tasks_.empty())
-            {
+            if (stop_ && tasks_.empty()) {
                 return;
             }
 

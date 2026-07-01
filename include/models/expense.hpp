@@ -2,8 +2,7 @@
 
 #include <string>
 
-namespace ragc
-{
+namespace ragc {
 
 struct Expense
 {

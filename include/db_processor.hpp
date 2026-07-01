@@ -1,11 +1,10 @@
 #pragma once
 
+#include <string_view>
 #include "connection_pool.hpp"
 #include "models/expense.hpp"
-#include <string_view>
 
-namespace ragc
-{
+namespace ragc {
 
 class DatabaseProcessor
 {
@@ -22,12 +21,12 @@ public:
     void init_tables();
 
     /** Thread-safe: each call acquires its own connection from the pool. */
-    bool save_expense(const Expense &expense);
+    bool save_expense(const Expense& expense);
 
     // --- Persistency & Retry methods ---
-    int64_t save_pending_request(int64_t user_id, const std::string &input);
-    void update_pending_status(int64_t request_id, const std::string &status, const std::string &error = "");
-    void schedule_retry(int64_t request_id, int minutes_delay, const std::string &error);
+    int64_t save_pending_request(int64_t user_id, const std::string& input);
+    void update_pending_status(int64_t request_id, const std::string& status, const std::string& error = "");
+    void schedule_retry(int64_t request_id, int minutes_delay, const std::string& error);
 
     struct PendingTask
     {
